@@ -33,3 +33,10 @@ jobs:
     - name: 🧪 Run tests with pytest
       run: |
         python -m pytest test_yandex_s3_module.py -v
+
+    - name: Run integration tests (example)
+      env: # Передаем секреты как переменные окружения
+        AWS_ACCESS_KEY_ID: ${{ secrets.YANDEX_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.YANDEX_SECRET_KEY }}
+      run: |
+        python test_integration.py
