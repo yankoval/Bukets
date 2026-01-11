@@ -1,0 +1,47 @@
+name: 🧪 Run Python Tests
+
+on: # Триггеры запуска
+  push: # При пуше в ветки
+    branches:
+      - '**' # Запускать для всех веток
+  pull_request: # И при создании/обновлении Pull Request
+    branches:
+      - main
+
+jobs:
+  test: # Задача "Запуск тестов"
+    runs-on: ubuntu-latest # Используем последний Ubuntu[citation:1]
+    strategy: # Стратегия: тестируем на нескольких версиях Python
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12'] # Укажите нужные версии
+
+    steps: # Последовательность шагов
+    # 1. Получение кода репозитория
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v4 # Важный первый шаг[citation:5][citation:7]
+
+    # 2. Настройка Python (используйте конкретную версию из матрицы)
+    - name: 🐍 Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5[citation:3][citation:5]
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # 3. Установка зависимостей проекта (с кешированием для ускорения)
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      # Кеширование зависимостей pip (опционально, но ускоряет сборки)
+      # Раскомментируйте блок ниже для активации кеша:
+      # env:
+      #   CACHE_NUMBER: 1
+      # with:
+      #   path: ~/.cache/pip
+      #   key: ${{ runner.os }}-pip-${{ env.CACHE_NUMBER }}-${{ hashFiles('**/requirements.txt') }}
+      #   restore-keys: |
+      #     ${{ runner.os }}-pip-${{ env.CACHE_NUMBER }}-
+
+    # 4. Запуск тестов через pytest
+    - name: 🧪 Run tests with pytest
+      run: |
+        python -m pytest test_yandex_s3_module.py -v
